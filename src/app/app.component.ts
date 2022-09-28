@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FontSizeServiceService } from 'src/services/font-size-service/font-size-service.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,9 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'angular-agid';
+
+  constructor(
+    public fontSize: FontSizeServiceService
+  ){}
+
 }
