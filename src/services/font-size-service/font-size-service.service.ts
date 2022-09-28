@@ -1,37 +1,51 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { filter, map, Observable, Observer } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FontSizeServiceService {
 
-  private step: number = 2;
-  private textSize: number = 13;
-  private textSizeObserve: Observable<number>;
+  private step: number = 5;
+  private textSizeDefaultMap: Map<string,number>;
+  private textSizeMap: Map<string,number>;
+  private textSizeMapObserve: Observable<Map<string,number>>;
 
   constructor() { 
-    this.textSizeObserve = Observable.create ( (observer:any) => {
-      observer.next(this.textSize);
+
+    this.textSizeDefaultMap = new Map();
+    this.textSizeMap = new Map();
+  
+    this.textSizeMapObserve = new Observable( (observer: Observer<Map<string,number>>) => {
+      observer.next(this.textSizeMap);
     });
   }
 
-  getTextSize(): Observable<number> {
-    return this.textSizeObserve;
+  init(element: string, size: number){
+    this.textSizeDefaultMap.set(element, size);
+    this.setTextSize(element, size);
   }
 
-  private setTextSize(size: number){
-    this.textSizeObserve = Observable.create ( (observer:any) => {
-      this.textSize = size;
-      observer.next(size);
-    });
+  getTextSize(element: string): Observable<number | undefined> {
+    return this.textSizeMapObserve
+      .pipe(filter( e => e.has(element) ))
+      .pipe(map( e => e.get(element) ));
   }
 
-  increseTextSize(){
-    this.setTextSize(this.textSize + this.step);
+  private setTextSize(element: string, size: number){
+    this.textSizeMapObserve = new Observable( (observer: Observer<Map<string,number>>) => {
+      this.textSizeMap.set(element, size);
+      observer.next(this.textSizeMap);
+    })
   }
 
-  decreseTextSize(){
-    this.setTextSize(this.textSize - this.step);
+  increseTextSize(element: string){
+    let size = (this.textSizeMap.get(element) ?? this.textSizeDefaultMap.get(element)! ) + this.step;
+    this.setTextSize(element, size);
+  }
+
+  reduceTextSize(element: string){
+    let size = (this.textSizeMap.get(element) ?? this.textSizeDefaultMap.get(element)! ) - this.step;
+    this.setTextSize(element, size);
   }
 }

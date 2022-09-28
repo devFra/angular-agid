@@ -9,8 +9,17 @@ import { FontSizeServiceService } from 'src/services/font-size-service/font-size
 export class AppComponent {
   title = 'angular-agid';
 
+  // Text tag increse 
+  textType = {
+    title: 'title',
+    body: 'body'
+  }
+
   constructor(
     public fontSize: FontSizeServiceService
-  ){}
+  ){
+    this.fontSize.init(this.textType.title, 23);
+    this.fontSize.init(this.textType.body, 11);
+  }
 
 }
